@@ -20,14 +20,8 @@ namespace Prism.Modularity
         /// <param name="loggerFacade">The logger to use.</param>
         public ModuleInitializer(IServiceLocator serviceLocator, ILoggerFacade loggerFacade)
         {
-            if (serviceLocator == null)
-                throw new ArgumentNullException(nameof(serviceLocator));
-
-            if (loggerFacade == null)
-                throw new ArgumentNullException(nameof(loggerFacade));
-
-            this.serviceLocator = serviceLocator;
-            this.loggerFacade = loggerFacade;
+            this.serviceLocator = serviceLocator ?? throw new ArgumentNullException(nameof(serviceLocator));
+            this.loggerFacade = loggerFacade ?? throw new ArgumentNullException(nameof(loggerFacade));
         }
 
         /// <summary>
@@ -43,13 +37,12 @@ namespace Prism.Modularity
             IModule moduleInstance = null;
             try
             {
-                moduleInstance = this.CreateModule(moduleInfo);
-                if (moduleInstance != null)
-                    moduleInstance.OnInitialized();
+                moduleInstance = CreateModule(moduleInfo);
+                moduleInstance?.OnInitialized();
             }
             catch (Exception ex)
             {
-                this.HandleModuleInitializationError(
+                HandleModuleInitializationError(
                     moduleInfo,
                     moduleInstance != null ? moduleInstance.GetType().Assembly.FullName : null,
                     ex);
@@ -114,12 +107,12 @@ namespace Prism.Modularity
         /// </summary>
         /// <param name="typeName">The type name to resolve. This type must implement <see cref="IModule"/>.</param>
         /// <returns>A new instance of <paramref name="typeName"/>.</returns>
-        protected virtual IModule CreateModule(string typeName)
+        protected virtual IModule CreateModule(Type moduleType)
         {
-            Type moduleType = Type.GetType(typeName);
+            //Type moduleType = Type.GetType(typeName);
             if (moduleType == null)
             {
-                throw new ModuleInitializeException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.FailedToGetType, typeName));
+                throw new ModuleInitializeException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.FailedToGetType, moduleType.AssemblyQualifiedName));
             }
 
             return (IModule)this.serviceLocator.GetInstance(moduleType);

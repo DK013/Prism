@@ -43,10 +43,12 @@ namespace Prism.Modularity
 
         private static string GetFileAbsoluteUri(string filePath)
         {
-            UriBuilder uriBuilder = new UriBuilder();
-            uriBuilder.Host = String.Empty;
-            uriBuilder.Scheme = Uri.UriSchemeFile;
-            uriBuilder.Path = Path.GetFullPath(filePath);
+            UriBuilder uriBuilder = new UriBuilder
+            {
+                Host = string.Empty,
+                Scheme = Uri.UriSchemeFile,
+                Path = Path.GetFullPath(filePath)
+            };
             Uri fileUri = uriBuilder.Uri;
 
             return fileUri.ToString();
@@ -70,7 +72,7 @@ namespace Prism.Modularity
                         }
                     }
 
-                    ModuleInfo moduleInfo = new ModuleInfo(element.ModuleName, element.ModuleType)
+                    ModuleInfo moduleInfo = new ModuleInfo(element.ModuleName, Type.GetType(element.ModuleType))
                     {
                         Ref = GetFileAbsoluteUri(element.AssemblyFile),
                         InitializationMode = element.StartupLoaded ? InitializationMode.WhenAvailable : InitializationMode.OnDemand

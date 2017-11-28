@@ -225,9 +225,10 @@ namespace Prism.Modularity
         /// </summary>
         /// <param name="moduleInfo">The <see cref="ModuleInfo"/> to add.</param>
         /// <returns>The <see cref="ModuleCatalog"/> for easily adding multiple modules.</returns>
-        public virtual void AddModule(ModuleInfo moduleInfo)
+        public virtual IModuleCatalog AddModule(ModuleInfo moduleInfo)
         {
             this.Items.Add(moduleInfo);
+            return this;
         }
 
         /// <summary>
@@ -236,10 +237,10 @@ namespace Prism.Modularity
         /// <param name="moduleType"><see cref="Type"/> of the module to be added.</param>
         /// <param name="dependsOn">Collection of module names (<see cref="ModuleInfo.ModuleName"/>) of the modules on which the module to be added logically depends on.</param>
         /// <returns>The same <see cref="ModuleCatalog"/> instance with the added module.</returns>
-        public ModuleCatalog AddModule(Type moduleType, params string[] dependsOn)
-        {
-            return this.AddModule(moduleType, InitializationMode.WhenAvailable, dependsOn);
-        }
+        //public IModuleCatalog AddModule(Type moduleType, params string[] dependsOn)
+        //{
+        //    return this.AddModule(moduleType, InitializationMode.WhenAvailable, dependsOn);
+        //}
 
         /// <summary>
         /// Adds a groupless <see cref="ModuleInfo"/> to the catalog.
@@ -248,11 +249,11 @@ namespace Prism.Modularity
         /// <param name="initializationMode">Stage on which the module to be added will be initialized.</param>
         /// <param name="dependsOn">Collection of module names (<see cref="ModuleInfo.ModuleName"/>) of the modules on which the module to be added logically depends on.</param>
         /// <returns>The same <see cref="ModuleCatalog"/> instance with the added module.</returns>
-        public ModuleCatalog AddModule(Type moduleType, InitializationMode initializationMode, params string[] dependsOn)
-        {
-            if (moduleType == null) throw new ArgumentNullException(nameof(moduleType));
-            return this.AddModule(moduleType.Name, moduleType.AssemblyQualifiedName, initializationMode, dependsOn);
-        }
+        //public IModuleCatalog AddModule(Type moduleType, InitializationMode initializationMode, params string[] dependsOn)
+        //{
+        //    if (moduleType == null) throw new ArgumentNullException(nameof(moduleType));
+        //    return this.AddModule(moduleType, moduleType.AssemblyQualifiedName, initializationMode, dependsOn);
+        //}
 
         /// <summary>
         /// Adds a groupless <see cref="ModuleInfo"/> to the catalog.
@@ -261,7 +262,7 @@ namespace Prism.Modularity
         /// <param name="moduleType"><see cref="Type"/> of the module to be added.</param>
         /// <param name="dependsOn">Collection of module names (<see cref="ModuleInfo.ModuleName"/>) of the modules on which the module to be added logically depends on.</param>
         /// <returns>The same <see cref="ModuleCatalog"/> instance with the added module.</returns>
-        public ModuleCatalog AddModule(string moduleName, string moduleType, params string[] dependsOn)
+        public IModuleCatalog AddModule(string moduleName, Type moduleType, params string[] dependsOn)
         {
             return this.AddModule(moduleName, moduleType, InitializationMode.WhenAvailable, dependsOn);
         }
@@ -274,7 +275,7 @@ namespace Prism.Modularity
         /// <param name="initializationMode">Stage on which the module to be added will be initialized.</param>
         /// <param name="dependsOn">Collection of module names (<see cref="ModuleInfo.ModuleName"/>) of the modules on which the module to be added logically depends on.</param>
         /// <returns>The same <see cref="ModuleCatalog"/> instance with the added module.</returns>
-        public ModuleCatalog AddModule(string moduleName, string moduleType, InitializationMode initializationMode, params string[] dependsOn)
+        public IModuleCatalog AddModule(string moduleName, Type moduleType, InitializationMode initializationMode, params string[] dependsOn)
         {
             return this.AddModule(moduleName, moduleType, null, initializationMode, dependsOn);
         }
@@ -288,7 +289,7 @@ namespace Prism.Modularity
         /// <param name="initializationMode">Stage on which the module to be added will be initialized.</param>
         /// <param name="dependsOn">Collection of module names (<see cref="ModuleInfo.ModuleName"/>) of the modules on which the module to be added logically depends on.</param>
         /// <returns>The same <see cref="ModuleCatalog"/> instance with the added module.</returns>
-        public ModuleCatalog AddModule(string moduleName, string moduleType, string refValue, InitializationMode initializationMode, params string[] dependsOn)
+        public ModuleCatalog AddModule(string moduleName, Type moduleType, string refValue, InitializationMode initializationMode, params string[] dependsOn)
         {
             if (moduleName == null)
                 throw new ArgumentNullException(nameof(moduleName));

@@ -30,7 +30,7 @@ namespace Prism.Modularity
             if (moduleInfoGroup == null)
                 throw new ArgumentNullException(nameof(moduleInfoGroup));
 
-            ModuleInfo moduleInfo = new ModuleInfo(moduleName, moduleType.AssemblyQualifiedName);
+            ModuleInfo moduleInfo = new ModuleInfo(moduleName, moduleType);
             moduleInfo.DependsOn.AddRange(dependsOn);
             moduleInfoGroup.Add(moduleInfo);
             return moduleInfoGroup;
