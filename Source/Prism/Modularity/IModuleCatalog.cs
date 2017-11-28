@@ -1,5 +1,3 @@
-
-
 using System.Collections.Generic;
 
 namespace Prism.Modularity
@@ -13,7 +11,7 @@ namespace Prism.Modularity
     public interface IModuleCatalog
     {
         /// <summary>
-        /// Gets all the <see cref="ModuleInfo"/> classes that are in the <see cref="ModuleCatalog"/>.
+        /// Gets all the <see cref="ModuleInfo"/> classes that are in the <see cref="IModuleCatalog"/>.
         /// </summary>
         IEnumerable<ModuleInfo> Modules { get; }
 
@@ -41,10 +39,10 @@ namespace Prism.Modularity
         void Initialize();
 
         /// <summary>
-        /// Adds a <see cref="ModuleInfo"/> to the <see cref="ModuleCatalog"/>.
+        /// Adds a <see cref="ModuleInfo"/> to the <see cref="IModuleCatalog"/>.
         /// </summary>
         /// <param name="moduleInfo">The <see cref="ModuleInfo"/> to add.</param>
-        /// <returns>The <see cref="ModuleCatalog"/> for easily adding multiple modules.</returns>
+        /// <returns>The <see cref="IModuleCatalog"/> for easily adding multiple modules.</returns>
         void AddModule(ModuleInfo moduleInfo);
     }
 }

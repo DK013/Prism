@@ -1,5 +1,3 @@
-
-
 using Prism.Logging;
 using Prism.Properties;
 using System;
@@ -28,18 +26,9 @@ namespace Prism.Modularity
         /// <param name="loggerFacade">Logger used during the load and initialization of modules.</param>
         public ModuleManager(IModuleInitializer moduleInitializer, IModuleCatalog moduleCatalog, ILoggerFacade loggerFacade)
         {
-            if (moduleInitializer == null)
-                throw new ArgumentNullException(nameof(moduleInitializer));
-
-            if (moduleCatalog == null)
-                throw new ArgumentNullException(nameof(moduleCatalog));
-
-            if (loggerFacade == null)
-                throw new ArgumentNullException(nameof(loggerFacade));
-
-            this.moduleInitializer = moduleInitializer;
-            this.moduleCatalog = moduleCatalog;
-            this.loggerFacade = loggerFacade;
+            this.moduleInitializer = moduleInitializer ?? throw new ArgumentNullException(nameof(moduleInitializer));
+            this.moduleCatalog = moduleCatalog ?? throw new ArgumentNullException(nameof(moduleCatalog));
+            this.loggerFacade = loggerFacade ?? throw new ArgumentNullException(nameof(loggerFacade));
         }
 
         /// <summary>
@@ -50,7 +39,7 @@ namespace Prism.Modularity
             get { return this.moduleCatalog; }
         }
 
-
+#if NET45
         /// <summary>
         /// Raised repeatedly to provide progress as modules are loaded in the background.
         /// </summary>
@@ -63,6 +52,7 @@ namespace Prism.Modularity
                 this.ModuleDownloadProgressChanged(this, e);
             }
         }
+#endif
 
         /// <summary>
         /// Raised when a module is loaded or fails to load.
@@ -76,10 +66,7 @@ namespace Prism.Modularity
 
         private void RaiseLoadModuleCompleted(LoadModuleCompletedEventArgs e)
         {
-            if (this.LoadModuleCompleted != null)
-            {
-                this.LoadModuleCompleted(this, e);
-            }
+            this.LoadModuleCompleted?.Invoke(this, e);
         }
 
         /// <summary>
@@ -205,7 +192,9 @@ namespace Prism.Modularity
             // We only want to subscribe to each instance once.
             if (!this.subscribedToModuleTypeLoaders.Contains(moduleTypeLoader))
             {
+#if NET45
                 moduleTypeLoader.ModuleDownloadProgressChanged += this.IModuleTypeLoader_ModuleDownloadProgressChanged;
+#endif
                 moduleTypeLoader.LoadModuleCompleted += this.IModuleTypeLoader_LoadModuleCompleted;
                 this.subscribedToModuleTypeLoaders.Add(moduleTypeLoader);
             }
@@ -213,10 +202,12 @@ namespace Prism.Modularity
             moduleTypeLoader.LoadModuleType(moduleInfo);
         }
 
+#if NET45
         private void IModuleTypeLoader_ModuleDownloadProgressChanged(object sender, ModuleDownloadProgressChangedEventArgs e)
         {
             this.RaiseModuleDownloadProgressChanged(e);
         }
+#endif
 
         private void IModuleTypeLoader_LoadModuleCompleted(object sender, LoadModuleCompletedEventArgs e)
         {
@@ -294,7 +285,7 @@ namespace Prism.Modularity
                 }
             }
 
-            throw new ModuleTypeLoaderNotFoundException(moduleInfo.ModuleName, String.Format(CultureInfo.CurrentCulture, Resources.NoRetrieverCanRetrieveModule, moduleInfo.ModuleName), null);
+            throw new ModuleTypeLoaderNotFoundException(moduleInfo.ModuleName, string.Format(CultureInfo.CurrentCulture, Resources.NoRetrieverCanRetrieveModule, moduleInfo.ModuleName), null);
         }
 
         private void InitializeModule(ModuleInfo moduleInfo)
@@ -307,7 +298,7 @@ namespace Prism.Modularity
             }
         }
 
-        #region Implementation of IDisposable
+#region Implementation of IDisposable
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
@@ -328,14 +319,13 @@ namespace Prism.Modularity
         {
             foreach (IModuleTypeLoader typeLoader in this.ModuleTypeLoaders)
             {
-                IDisposable disposableTypeLoader = typeLoader as IDisposable;
-                if (disposableTypeLoader != null)
+                if (typeLoader is IDisposable disposableTypeLoader)
                 {
                     disposableTypeLoader.Dispose();
                 }
             }
         }
 
-        #endregion
+#endregion
     }
 }

@@ -1,5 +1,3 @@
-
-
 using System.Collections.Generic;
 
 namespace Prism.Modularity
@@ -22,7 +20,7 @@ namespace Prism.Modularity
                 {
                     this.typeLoaders = new List<IModuleTypeLoader>
                                           {
-                                              new FileModuleTypeLoader()
+                                              //new FileModuleTypeLoader()
                                           };
                 }
 

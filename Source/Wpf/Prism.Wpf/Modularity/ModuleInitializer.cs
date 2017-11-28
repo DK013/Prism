@@ -1,5 +1,3 @@
-
-
 using CommonServiceLocator;
 using Prism.Logging;
 using System;
@@ -47,7 +45,7 @@ namespace Prism.Modularity
             {
                 moduleInstance = this.CreateModule(moduleInfo);
                 if (moduleInstance != null)
-                    moduleInstance.Initialize();
+                    moduleInstance.OnInitialized();
             }
             catch (Exception ex)
             {
