@@ -43,6 +43,6 @@ namespace Prism.Modularity
         /// </summary>
         /// <param name="moduleInfo">The <see cref="ModuleInfo"/> to add.</param>
         /// <returns>The <see cref="IModuleCatalog"/> for easily adding multiple modules.</returns>
-        void AddModule(ModuleInfo moduleInfo);
+        IModuleCatalog AddModule(ModuleInfo moduleInfo);
     }
 }

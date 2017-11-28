@@ -37,5 +37,20 @@ namespace Prism.Modularity
             _items.Add(moduleInfo);
             return this;
         }
+
+        public IEnumerable<ModuleInfo> CompleteListWithDependencies(IEnumerable<ModuleInfo> modules)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<ModuleInfo> GetDependentModules(ModuleInfo moduleInfo)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Initialize()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

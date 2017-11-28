@@ -12,9 +12,9 @@ namespace Prism.Modularity
     /// </summary>
     public partial class ModuleManager : IModuleManager, IDisposable
     {
-        private readonly IModuleInitializer moduleInitializer;
-        private readonly IModuleCatalog moduleCatalog;
-        private readonly ILoggerFacade loggerFacade;
+        private IModuleInitializer _moduleInitializer { get; }
+        private IModuleCatalog _moduleCatalog { get; }
+        private ILoggerFacade _loggerFacade { get; }
         private IEnumerable<IModuleTypeLoader> typeLoaders;
         private HashSet<IModuleTypeLoader> subscribedToModuleTypeLoaders = new HashSet<IModuleTypeLoader>();
 
@@ -26,18 +26,22 @@ namespace Prism.Modularity
         /// <param name="loggerFacade">Logger used during the load and initialization of modules.</param>
         public ModuleManager(IModuleInitializer moduleInitializer, IModuleCatalog moduleCatalog, ILoggerFacade loggerFacade)
         {
-            this.moduleInitializer = moduleInitializer ?? throw new ArgumentNullException(nameof(moduleInitializer));
-            this.moduleCatalog = moduleCatalog ?? throw new ArgumentNullException(nameof(moduleCatalog));
-            this.loggerFacade = loggerFacade ?? throw new ArgumentNullException(nameof(loggerFacade));
+            _moduleInitializer = moduleInitializer ?? throw new ArgumentNullException(nameof(moduleInitializer));
+            _moduleCatalog = moduleCatalog ?? throw new ArgumentNullException(nameof(moduleCatalog));
+            _loggerFacade = loggerFacade ?? throw new ArgumentNullException(nameof(loggerFacade));
         }
 
         /// <summary>
         /// The module catalog specified in the constructor.
         /// </summary>
-        protected IModuleCatalog ModuleCatalog
-        {
-            get { return this.moduleCatalog; }
-        }
+        protected IModuleCatalog ModuleCatalog => _moduleCatalog;
+
+        /// <summary>
+        /// Returns the list of registered <see cref="IModuleTypeLoader"/> instances that will be 
+        /// used to load the types of modules. 
+        /// </summary>
+        /// <value>The module type loaders.</value>
+        public virtual IEnumerable<IModuleTypeLoader> ModuleTypeLoaders { get; set; }
 
 #if NET45
         /// <summary>
@@ -47,10 +51,7 @@ namespace Prism.Modularity
 
         private void RaiseModuleDownloadProgressChanged(ModuleDownloadProgressChangedEventArgs e)
         {
-            if (this.ModuleDownloadProgressChanged != null)
-            {
-                this.ModuleDownloadProgressChanged(this, e);
-            }
+            ModuleDownloadProgressChanged?.Invoke(this, e);
         }
 #endif
 
@@ -59,24 +60,20 @@ namespace Prism.Modularity
         /// </summary>
         public event EventHandler<LoadModuleCompletedEventArgs> LoadModuleCompleted;
 
-        private void RaiseLoadModuleCompleted(ModuleInfo moduleInfo, Exception error)
-        {
-            this.RaiseLoadModuleCompleted(new LoadModuleCompletedEventArgs(moduleInfo, error));
-        }
+        private void RaiseLoadModuleCompleted(ModuleInfo moduleInfo, Exception error) => 
+            RaiseLoadModuleCompleted(new LoadModuleCompletedEventArgs(moduleInfo, error));
 
-        private void RaiseLoadModuleCompleted(LoadModuleCompletedEventArgs e)
-        {
-            this.LoadModuleCompleted?.Invoke(this, e);
-        }
+        private void RaiseLoadModuleCompleted(LoadModuleCompletedEventArgs e) => 
+            LoadModuleCompleted?.Invoke(this, e);
 
         /// <summary>
         /// Initializes the modules marked as <see cref="InitializationMode.WhenAvailable"/> on the <see cref="ModuleCatalog"/>.
         /// </summary>
         public void Run()
         {
-            this.moduleCatalog.Initialize();
+            _moduleCatalog.Initialize();
 
-            this.LoadModulesWhenAvailable();
+            LoadModulesWhenAvailable();
         }
 
 
@@ -86,15 +83,15 @@ namespace Prism.Modularity
         /// <param name="moduleName">Name of the module requested for initialization.</param>
         public void LoadModule(string moduleName)
         {
-            IEnumerable<ModuleInfo> module = this.moduleCatalog.Modules.Where(m => m.ModuleName == moduleName);
+            IEnumerable<ModuleInfo> module = _moduleCatalog.Modules.Where(m => m.ModuleName == moduleName);
             if (module == null || module.Count() != 1)
             {
                 throw new ModuleNotFoundException(moduleName, string.Format(CultureInfo.CurrentCulture, Resources.ModuleNotFound, moduleName));
             }
 
-            IEnumerable<ModuleInfo> modulesToLoad = this.moduleCatalog.CompleteListWithDependencies(module);
+            IEnumerable<ModuleInfo> modulesToLoad = _moduleCatalog.CompleteListWithDependencies(module);
 
-            this.LoadModuleTypes(modulesToLoad);
+            LoadModuleTypes(modulesToLoad);
         }
 
         /// <summary>
@@ -111,7 +108,8 @@ namespace Prism.Modularity
             {
                 // If we can instantiate the type, that means the module's assembly is already loaded into
                 // the AppDomain and we don't need to retrieve it.
-                bool isAvailable = Type.GetType(moduleInfo.ModuleType) != null;
+                bool isAvailable = moduleInfo.ModuleType != null;
+
                 if (isAvailable)
                 {
                     moduleInfo.State = ModuleState.ReadyForInitialization;
@@ -125,11 +123,11 @@ namespace Prism.Modularity
 
         private void LoadModulesWhenAvailable()
         {
-            IEnumerable<ModuleInfo> whenAvailableModules = this.moduleCatalog.Modules.Where(m => m.InitializationMode == InitializationMode.WhenAvailable);
-            IEnumerable<ModuleInfo> modulesToLoadTypes = this.moduleCatalog.CompleteListWithDependencies(whenAvailableModules);
+            IEnumerable<ModuleInfo> whenAvailableModules = _moduleCatalog.Modules.Where(m => m.InitializationMode == InitializationMode.WhenAvailable);
+            IEnumerable<ModuleInfo> modulesToLoadTypes = _moduleCatalog.CompleteListWithDependencies(whenAvailableModules);
             if (modulesToLoadTypes != null)
             {
-                this.LoadModuleTypes(modulesToLoadTypes);
+                LoadModuleTypes(modulesToLoadTypes);
             }
         }
 
@@ -144,9 +142,9 @@ namespace Prism.Modularity
             {
                 if (moduleInfo.State == ModuleState.NotStarted)
                 {
-                    if (this.ModuleNeedsRetrieval(moduleInfo))
+                    if (ModuleNeedsRetrieval(moduleInfo))
                     {
-                        this.BeginRetrievingModule(moduleInfo);
+                        BeginRetrievingModule(moduleInfo);
                     }
                     else
                     {
@@ -155,7 +153,7 @@ namespace Prism.Modularity
                 }
             }
 
-            this.LoadModulesThatAreReadyForLoad();
+            LoadModulesThatAreReadyForLoad();
         }
 
         /// <summary>
@@ -167,14 +165,14 @@ namespace Prism.Modularity
             while (keepLoading)
             {
                 keepLoading = false;
-                IEnumerable<ModuleInfo> availableModules = this.moduleCatalog.Modules.Where(m => m.State == ModuleState.ReadyForInitialization);
+                IEnumerable<ModuleInfo> availableModules = _moduleCatalog.Modules.Where(m => m.State == ModuleState.ReadyForInitialization);
 
                 foreach (ModuleInfo moduleInfo in availableModules)
                 {
-                    if ((moduleInfo.State != ModuleState.Initialized) && (this.AreDependenciesLoaded(moduleInfo)))
+                    if ((moduleInfo.State != ModuleState.Initialized) && (AreDependenciesLoaded(moduleInfo)))
                     {
                         moduleInfo.State = ModuleState.Initializing;
-                        this.InitializeModule(moduleInfo);
+                        InitializeModule(moduleInfo);
                         keepLoading = true;
                         break;
                     }
@@ -185,18 +183,18 @@ namespace Prism.Modularity
         private void BeginRetrievingModule(ModuleInfo moduleInfo)
         {
             ModuleInfo moduleInfoToLoadType = moduleInfo;
-            IModuleTypeLoader moduleTypeLoader = this.GetTypeLoaderForModule(moduleInfoToLoadType);
+            IModuleTypeLoader moduleTypeLoader = GetTypeLoaderForModule(moduleInfoToLoadType);
             moduleInfoToLoadType.State = ModuleState.LoadingTypes;
 
             // Delegate += works differently betweem SL and WPF.
             // We only want to subscribe to each instance once.
-            if (!this.subscribedToModuleTypeLoaders.Contains(moduleTypeLoader))
+            if (!subscribedToModuleTypeLoaders.Contains(moduleTypeLoader))
             {
 #if NET45
-                moduleTypeLoader.ModuleDownloadProgressChanged += this.IModuleTypeLoader_ModuleDownloadProgressChanged;
+                moduleTypeLoader.ModuleDownloadProgressChanged += IModuleTypeLoader_ModuleDownloadProgressChanged;
 #endif
-                moduleTypeLoader.LoadModuleCompleted += this.IModuleTypeLoader_LoadModuleCompleted;
-                this.subscribedToModuleTypeLoaders.Add(moduleTypeLoader);
+                moduleTypeLoader.LoadModuleCompleted += IModuleTypeLoader_LoadModuleCompleted;
+                subscribedToModuleTypeLoaders.Add(moduleTypeLoader);
             }
 
             moduleTypeLoader.LoadModuleType(moduleInfo);
@@ -205,7 +203,7 @@ namespace Prism.Modularity
 #if NET45
         private void IModuleTypeLoader_ModuleDownloadProgressChanged(object sender, ModuleDownloadProgressChangedEventArgs e)
         {
-            this.RaiseModuleDownloadProgressChanged(e);
+            RaiseModuleDownloadProgressChanged(e);
         }
 #endif
 
@@ -221,16 +219,16 @@ namespace Prism.Modularity
                 // This callback may call back on the UI thread, but we are not guaranteeing it.
                 // If you were to add a custom retriever that retrieved in the background, you
                 // would need to consider dispatching to the UI thread.
-                this.LoadModulesThatAreReadyForLoad();
+                LoadModulesThatAreReadyForLoad();
             }
             else
             {
-                this.RaiseLoadModuleCompleted(e);
+                RaiseLoadModuleCompleted(e);
 
                 // If the error is not handled then I log it and raise an exception.
                 if (!e.IsErrorHandled)
                 {
-                    this.HandleModuleTypeLoadingError(e.ModuleInfo, e.Error);
+                    HandleModuleTypeLoadingError(e.ModuleInfo, e.Error);
                 }
             }
         }
@@ -256,14 +254,14 @@ namespace Prism.Modularity
                 moduleTypeLoadingException = new ModuleTypeLoadingException(moduleInfo.ModuleName, exception.Message, exception);
             }
 
-            this.loggerFacade.Log(moduleTypeLoadingException.Message, Category.Exception, Priority.High);
+            _loggerFacade.Log(moduleTypeLoadingException.Message, Category.Exception, Priority.High);
 
             throw moduleTypeLoadingException;
         }
 
         private bool AreDependenciesLoaded(ModuleInfo moduleInfo)
         {
-            IEnumerable<ModuleInfo> requiredModules = this.moduleCatalog.GetDependentModules(moduleInfo);
+            IEnumerable<ModuleInfo> requiredModules = _moduleCatalog.GetDependentModules(moduleInfo);
             if (requiredModules == null)
             {
                 return true;
@@ -277,7 +275,7 @@ namespace Prism.Modularity
 
         private IModuleTypeLoader GetTypeLoaderForModule(ModuleInfo moduleInfo)
         {
-            foreach (IModuleTypeLoader typeLoader in this.ModuleTypeLoaders)
+            foreach (IModuleTypeLoader typeLoader in ModuleTypeLoaders)
             {
                 if (typeLoader.CanLoadModuleType(moduleInfo))
                 {
@@ -292,9 +290,9 @@ namespace Prism.Modularity
         {
             if (moduleInfo.State == ModuleState.Initializing)
             {
-                this.moduleInitializer.Initialize(moduleInfo);
+                _moduleInitializer.Initialize(moduleInfo);
                 moduleInfo.State = ModuleState.Initialized;
-                this.RaiseLoadModuleCompleted(moduleInfo, null);
+                RaiseLoadModuleCompleted(moduleInfo, null);
             }
         }
 
@@ -307,7 +305,7 @@ namespace Prism.Modularity
         /// <filterpriority>2</filterpriority>
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 
@@ -317,7 +315,7 @@ namespace Prism.Modularity
         /// <param name="disposing">When <see langword="true"/>, it is being called from the Dispose method.</param>
         protected virtual void Dispose(bool disposing)
         {
-            foreach (IModuleTypeLoader typeLoader in this.ModuleTypeLoaders)
+            foreach (IModuleTypeLoader typeLoader in ModuleTypeLoaders)
             {
                 if (typeLoader is IDisposable disposableTypeLoader)
                 {
