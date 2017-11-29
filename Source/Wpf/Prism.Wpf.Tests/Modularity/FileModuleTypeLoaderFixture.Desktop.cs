@@ -18,7 +18,7 @@ namespace Prism.Wpf.Tests.Modularity
             var retriever = new FileModuleTypeLoader(assemblyResolver);
             string assembly = CompilerHelper.GenerateDynamicModule("FileModuleA", null);
             string assemblyRef = "file://" + assembly;
-            var fileModuleInfo = CreateModuleInfo(assemblyRef, "TestModules.FileModuleAClass", "ModuleA", true, null);
+            var fileModuleInfo = CreateModuleInfo(assemblyRef, Type.GetType("TestModules.FileModuleAClass"), "ModuleA", true, null);
 
             bool loadCompleted = false;
             retriever.LoadModuleCompleted += delegate(object sender, LoadModuleCompletedEventArgs e)
@@ -37,7 +37,7 @@ namespace Prism.Wpf.Tests.Modularity
         {
             var assemblyResolver = new MockAssemblyResolver();
             var retriever = new FileModuleTypeLoader(assemblyResolver);
-            var fileModuleInfo = CreateModuleInfo("NonExistentFile.dll", "NonExistentModule", "NonExistent", true, null);
+            var fileModuleInfo = CreateModuleInfo("NonExistentFile.dll", Type.GetType("NonExistentModule"), "NonExistent", true, null);
 
             assemblyResolver.ThrowOnLoadAssemblyFrom = true;
             Exception resultException = null;
@@ -112,9 +112,9 @@ namespace Prism.Wpf.Tests.Modularity
             }
         }
 
-        private static ModuleInfo CreateModuleInfo(string assemblyFile, string moduleType, string moduleName, bool startupLoaded, params string[] dependsOn)
+        private static ModuleInfo CreateModuleInfo(string assemblyFile, Type moduleType, string moduleName, bool startupLoaded, params string[] dependsOn)
         {
-            ModuleInfo moduleInfo = new ModuleInfo(moduleName, moduleType)
+            ModuleInfo moduleInfo = new ModuleInfo(moduleType, moduleName)
             {
                 InitializationMode = startupLoaded ? InitializationMode.WhenAvailable : InitializationMode.OnDemand,
                 Ref = assemblyFile,

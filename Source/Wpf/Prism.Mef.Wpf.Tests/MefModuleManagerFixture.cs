@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using Prism.Ioc;
 using Prism.Logging;
 using Prism.Mef.Modularity;
 using Prism.Modularity;
@@ -17,7 +18,7 @@ namespace Prism.Mef.Wpf.Tests
         public void ModuleNeedsRetrievalReturnsTrueWhenModulesAreNotImported()
         {
             TestableMefModuleManager moduleManager = new TestableMefModuleManager();
-            bool result = moduleManager.CallModuleNeedsRetrieval(new ModuleInfo("name", "type"));
+            bool result = moduleManager.CallModuleNeedsRetrieval(new ModuleInfo(Type.GetType("type"), "name"));
 
             Assert.IsTrue(result);
         }
@@ -30,7 +31,7 @@ namespace Prism.Mef.Wpf.Tests
                                                              Modules = (IEnumerable<Lazy<IModule, IModuleExport>>)new List<Lazy<IModule, IModuleExport>>()
                                                          };
 
-            bool result = moduleManager.CallModuleNeedsRetrieval(new ModuleInfo("name", "type"));
+            bool result = moduleManager.CallModuleNeedsRetrieval(new ModuleInfo(Type.GetType("type"), "name"));
 
             Assert.IsTrue(result);
         }
@@ -43,7 +44,7 @@ namespace Prism.Mef.Wpf.Tests
                 Modules = new List<Lazy<IModule, IModuleExport>>() { new Lazy<IModule, IModuleExport>(() => new TestModule(), new TestModuleMetadata()) }
             };
 
-            bool result = moduleManager.CallModuleNeedsRetrieval(new ModuleInfo("name", "type"));
+            bool result = moduleManager.CallModuleNeedsRetrieval(new ModuleInfo(Type.GetType("type"), "name"));
 
             Assert.IsTrue(result);
         }
@@ -56,7 +57,7 @@ namespace Prism.Mef.Wpf.Tests
                 Modules = new List<Lazy<IModule, IModuleExport>>() { new Lazy<IModule, IModuleExport>(() => new TestModule(), new TestModuleMetadata()) }
             };
 
-            bool result = moduleManager.CallModuleNeedsRetrieval(new ModuleInfo("TestModule", "Microsoft.Practices.Prism.MefExtensions.Tests.MefModuleManagerFixture.TestModule"));
+            bool result = moduleManager.CallModuleNeedsRetrieval(new ModuleInfo(Type.GetType("Microsoft.Practices.Prism.MefExtensions.Tests.MefModuleManagerFixture.TestModule"), "TestModule"));
 
             Assert.IsFalse(result);
         }
@@ -142,7 +143,12 @@ namespace Prism.Mef.Wpf.Tests
 
         public class TestModule : IModule
         {
-            public void Initialize()
+            public void OnInitialized()
+            {
+                //no-op
+            }
+
+            public void RegisterTypes(IContainerRegistry containerRegistry)
             {
                 //no-op
             }

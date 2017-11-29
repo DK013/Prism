@@ -67,7 +67,7 @@ namespace Prism.Mef.Modularity
                     ModuleInfo moduleInfo = new ModuleInfo()
                     {
                         ModuleName = lazyModule.Metadata.ModuleName,
-                        ModuleType = moduleType.AssemblyQualifiedName,
+                        ModuleType = moduleType,
                         InitializationMode = lazyModule.Metadata.InitializationMode,
                         State = lazyModule.Metadata.InitializationMode == InitializationMode.OnDemand ? ModuleState.NotStarted : ModuleState.ReadyForInitialization,
                     };
@@ -82,7 +82,7 @@ namespace Prism.Mef.Modularity
                 else
                 {
                     // If the module is already in the catalog then override the module type name from the imported module
-                    registeredModule.ModuleType = moduleType.AssemblyQualifiedName;
+                    registeredModule.ModuleType = moduleType;
                 }
             }
 

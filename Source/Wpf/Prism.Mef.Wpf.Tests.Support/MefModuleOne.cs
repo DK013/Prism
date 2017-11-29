@@ -1,5 +1,6 @@
 
 
+using Prism.Ioc;
 using Prism.Mef.Modularity;
 using Prism.Modularity;
 
@@ -9,9 +10,15 @@ namespace Prism.Mef.Wpf.Tests.Support
     public class MefModuleOne : IModule
     {
         public bool WasInitialized = false;
-        public void Initialize()
+
+        public void OnInitialized()
         {
             WasInitialized = true;
+        }
+
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+
         }
     }
 }

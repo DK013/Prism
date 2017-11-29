@@ -162,7 +162,7 @@ namespace Prism.Mef.Wpf.Tests
 
 
             ModuleCatalog moduleCatalog = new ModuleCatalog();
-            ModuleInfo moduleInfo = new ModuleInfo { ModuleName = "MefModuleOne", ModuleType = "some type" };
+            ModuleInfo moduleInfo = new ModuleInfo { ModuleName = "MefModuleOne", ModuleType = Type.GetType("some type") };
             moduleCatalog.AddModule(moduleInfo);
 
             compositionContainer.ComposeExportedValue<IModuleCatalog>(moduleCatalog);

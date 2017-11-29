@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using Prism.Ioc;
 using Prism.Logging;
 using Prism.Modularity;
 using Prism.Wpf.Tests.Mocks;
@@ -287,8 +288,10 @@ namespace Prism.Wpf.Tests.Modularity
         {
             var loader = new MockModuleInitializer();
             var catalog = new MockModuleCatalog { Modules = { CreateModuleInfo("ModuleThatNeedsRetrieval", InitializationMode.WhenAvailable) } };
-            ModuleManager manager = new ModuleManager(loader, catalog, new MockLogger());
-            manager.ModuleTypeLoaders = new List<IModuleTypeLoader> { new MockModuleTypeLoader() { canLoadModuleTypeReturnValue = false } };
+            ModuleManager manager = new ModuleManager(loader, catalog, new MockLogger())
+            {
+                ModuleTypeLoaders = new List<IModuleTypeLoader> { new MockModuleTypeLoader() { canLoadModuleTypeReturnValue = false } }
+            };
             manager.Run();
         }
 
@@ -300,8 +303,10 @@ namespace Prism.Wpf.Tests.Modularity
             var catalog = new MockModuleCatalog { Modules = { moduleInfo } };
             var logger = new MockLogger();
             ModuleManager manager = new ModuleManager(loader, catalog, logger);
-            var moduleTypeLoader = new MockModuleTypeLoader();
-            moduleTypeLoader.LoadCompletedError = new Exception();
+            var moduleTypeLoader = new MockModuleTypeLoader
+            {
+                LoadCompletedError = new Exception()
+            };
             manager.ModuleTypeLoaders = new List<IModuleTypeLoader> { moduleTypeLoader };
 
             try
@@ -428,16 +433,20 @@ namespace Prism.Wpf.Tests.Modularity
         }
         private static ModuleInfo CreateModuleInfo(string name, InitializationMode initializationMode, params string[] dependsOn)
         {
-            ModuleInfo moduleInfo = new ModuleInfo(name, name);
-            moduleInfo.InitializationMode = initializationMode;
+            ModuleInfo moduleInfo = new ModuleInfo(Type.GetType(name), name)
+            {
+                InitializationMode = initializationMode
+            };
             moduleInfo.DependsOn.AddRange(dependsOn);
             return moduleInfo;
         }
 
         private static ModuleInfo CreateModuleInfo(Type type, InitializationMode initializationMode, params string[] dependsOn)
         {
-            ModuleInfo moduleInfo = new ModuleInfo(type.Name, type.AssemblyQualifiedName);
-            moduleInfo.InitializationMode = initializationMode;
+            ModuleInfo moduleInfo = new ModuleInfo(type, type.Name)
+            {
+                InitializationMode = initializationMode
+            };
             moduleInfo.DependsOn.AddRange(dependsOn);
             return moduleInfo;
         }
@@ -445,9 +454,14 @@ namespace Prism.Wpf.Tests.Modularity
 
     internal class MockModule : IModule
     {
-        public void Initialize()
+        public void OnInitialized()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
+        }
+
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            throw new NotImplementedException();
         }
     }
 
@@ -461,16 +475,15 @@ namespace Prism.Wpf.Tests.Modularity
 
         public void Initialize()
         {
-            if (this.ValidateCatalog != null)
-            {
-                this.ValidateCatalog();
-            }
+            ValidateCatalog?.Invoke();
         }
 
         IEnumerable<ModuleInfo> IModuleCatalog.Modules
         {
             get { return this.Modules; }
         }
+
+        public Collection<IModuleCatalogItem> Items { get; }
 
         IEnumerable<ModuleInfo> IModuleCatalog.GetDependentModules(ModuleInfo moduleInfo)
         {
@@ -491,6 +504,11 @@ namespace Prism.Wpf.Tests.Modularity
         public void AddModule(ModuleInfo moduleInfo)
         {
             this.Modules.Add(moduleInfo);
+        }
+
+        IModuleCatalog IModuleCatalog.AddModule(ModuleInfo moduleInfo)
+        {
+            throw new NotImplementedException();
         }
     }
 

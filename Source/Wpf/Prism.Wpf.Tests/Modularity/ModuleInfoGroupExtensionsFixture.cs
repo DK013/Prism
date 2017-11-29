@@ -3,6 +3,7 @@
 using System;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Prism.Ioc;
 using Prism.Modularity;
 
 namespace Prism.Wpf.Tests.Modularity
@@ -31,7 +32,7 @@ namespace Prism.Wpf.Tests.Modularity
             groupInfo.AddModule("MockModule", typeof(MockModule));
 
             Assert.AreEqual<int>(1, groupInfo.Count);
-            Assert.AreEqual<string>(typeof(MockModule).AssemblyQualifiedName, groupInfo.ElementAt(0).ModuleType);
+            Assert.AreEqual<string>(typeof(MockModule).AssemblyQualifiedName, groupInfo.ElementAt(0).ModuleType.AssemblyQualifiedName);
         }
 
         [TestMethod]
@@ -70,8 +71,14 @@ namespace Prism.Wpf.Tests.Modularity
 
         public class MockModule : IModule
         {
-            public void Initialize()
+            public void OnInitialized()
             {
+                
+            }
+
+            public void RegisterTypes(IContainerRegistry containerRegistry)
+            {
+                
             }
         }
     }

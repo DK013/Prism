@@ -17,7 +17,7 @@ namespace Prism.Wpf.Tests.Modularity
         [TestMethod]
         public void CanCreateCatalogFromList()
         {
-            var moduleInfo = new ModuleInfo("MockModule", "type");
+            var moduleInfo = new ModuleInfo(typeof(MockModule), "type");
             List<ModuleInfo> moduleInfos = new List<ModuleInfo> { moduleInfo };
 
             var moduleCatalog = new ModuleCatalog(moduleInfos);
@@ -370,7 +370,7 @@ namespace Prism.Wpf.Tests.Modularity
         {
             ModuleCatalog catalog = new ModuleCatalog();
 
-            catalog.AddModule("Module", "ModuleType", InitializationMode.OnDemand, "DependsOn1", "DependsOn2");
+            catalog.AddModule("Module", Type.GetType("ModuleType"), InitializationMode.OnDemand, "DependsOn1", "DependsOn2");
 
             Assert.AreEqual(1, catalog.Modules.Count());
             Assert.AreEqual("Module", catalog.Modules.First().ModuleName);
@@ -387,7 +387,7 @@ namespace Prism.Wpf.Tests.Modularity
         {
             ModuleCatalog catalog = new ModuleCatalog();
 
-            catalog.AddModule("Module", "ModuleType", "DependsOn1", "DependsOn2");
+            catalog.AddModule("Module", Type.GetType("ModuleType"), "DependsOn1", "DependsOn2");
 
             Assert.AreEqual(1, catalog.Modules.Count());
             Assert.AreEqual("Module", catalog.Modules.First().ModuleName);
@@ -440,8 +440,8 @@ namespace Prism.Wpf.Tests.Modularity
             catalog.Items.Add(new ModuleInfoGroup());
 
             catalog.AddGroup(InitializationMode.OnDemand, "Ref1",
-                             new ModuleInfo("M1", "T1"),
-                             new ModuleInfo("M2", "T2", "M1"));
+                             new ModuleInfo(Type.GetType("M1"), "T1"),
+                             new ModuleInfo(Type.GetType("M2"), "T2", "M1"));
 
             Assert.AreEqual(2, catalog.Modules.Count());
 
@@ -489,7 +489,7 @@ namespace Prism.Wpf.Tests.Modularity
 
         private static ModuleInfo CreateModuleInfo(string name, params string[] dependsOn)
         {
-            ModuleInfo moduleInfo = new ModuleInfo(name, name);
+            ModuleInfo moduleInfo = new ModuleInfo(Type.GetType(name), name);
             moduleInfo.DependsOn.AddRange(dependsOn);
             return moduleInfo;
         }

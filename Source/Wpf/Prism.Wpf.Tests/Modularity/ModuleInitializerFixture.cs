@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using CommonServiceLocator;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Prism.Ioc;
 using Prism.Logging;
 using Prism.Modularity;
 using Prism.Wpf.Tests.Mocks;
@@ -92,7 +93,7 @@ namespace Prism.Wpf.Tests.Modularity
         [TestMethod]
         public void ShouldThrowExceptionIfBogusType()
         {
-            var moduleInfo = new ModuleInfo("TestModule", "BadAssembly.BadType");
+            var moduleInfo = new ModuleInfo(Type.GetType("BadAssembly.BadType"), "TestModule");
 
             ModuleInitializer loader = new ModuleInitializer(new MockContainerAdapter(), new MockLogger());
 
@@ -114,7 +115,7 @@ namespace Prism.Wpf.Tests.Modularity
 
         private static ModuleInfo CreateModuleInfo(Type type, params string[] dependsOn)
         {
-            ModuleInfo moduleInfo = new ModuleInfo(type.Name, type.AssemblyQualifiedName);
+            ModuleInfo moduleInfo = new ModuleInfo(type, type.Name);
             moduleInfo.DependsOn.AddRange(dependsOn);
             return moduleInfo;
         }
@@ -128,10 +129,15 @@ namespace Prism.Wpf.Tests.Modularity
         {
             public static bool wasInitializedOnce;
 
-            public void Initialize()
+            public void OnInitialized()
             {
                 wasInitializedOnce = true;
                 ModuleLoadTracker.ModuleLoadStack.Push(GetType());
+            }
+
+            public void RegisterTypes(IContainerRegistry containerRegistry)
+            {
+
             }
         }
 
@@ -140,10 +146,15 @@ namespace Prism.Wpf.Tests.Modularity
             public static bool wasInitializedOnce;
             public static long initializedOnTickCount;
 
-            public void Initialize()
+            public void OnInitialized()
             {
                 wasInitializedOnce = true;
                 ModuleLoadTracker.ModuleLoadStack.Push(GetType());
+            }
+
+            public void RegisterTypes(IContainerRegistry containerRegistry)
+            {
+
             }
         }
 
@@ -153,8 +164,17 @@ namespace Prism.Wpf.Tests.Modularity
 
             public void Initialize()
             {
+            }
+
+            public void OnInitialized()
+            {
                 wasInitializedOnce = true;
                 ModuleLoadTracker.ModuleLoadStack.Push(GetType());
+            }
+
+            public void RegisterTypes(IContainerRegistry containerRegistry)
+            {
+
             }
         }
 
@@ -163,10 +183,15 @@ namespace Prism.Wpf.Tests.Modularity
             public static bool wasInitializedOnce;
             public static long initializedOnTickCount;
 
-            public void Initialize()
+            public void OnInitialized()
             {
                 wasInitializedOnce = true;
                 ModuleLoadTracker.ModuleLoadStack.Push(GetType());
+            }
+
+            public void RegisterTypes(IContainerRegistry containerRegistry)
+            {
+
             }
         }
 
@@ -175,9 +200,14 @@ namespace Prism.Wpf.Tests.Modularity
             public static bool wasInitializedOnce;
             public static long initializedOnTickCount;
 
-            public void Initialize()
+            public void OnInitialized()
             {
                 throw new InvalidOperationException("Intialization can't be performed");
+            }
+
+            public void RegisterTypes(IContainerRegistry containerRegistry)
+            {
+
             }
         }
 
@@ -198,9 +228,32 @@ namespace Prism.Wpf.Tests.Modularity
             }
         }
 
-        public class Module1 : IModule { void IModule.Initialize() { } }
-        public class Module2 : IModule { void IModule.Initialize() { } }
-        public class Module3 : IModule { void IModule.Initialize() { } }
-        public class Module4 : IModule { void IModule.Initialize() { } }
+        public class Module1 : IModule
+        {
+            void IModule.OnInitialized() { }
+
+            void IModule.RegisterTypes(IContainerRegistry containerRegistry) { }
+        }
+
+        public class Module2 : IModule
+        {
+            void IModule.OnInitialized() { }
+
+            void IModule.RegisterTypes(IContainerRegistry containerRegistry) { }
+        }
+
+        public class Module3 : IModule
+        {
+            void IModule.OnInitialized() { }
+
+            void IModule.RegisterTypes(IContainerRegistry containerRegistry) { }
+        }
+
+        public class Module4 : IModule
+        {
+            void IModule.OnInitialized() { }
+
+            void IModule.RegisterTypes(IContainerRegistry containerRegistry) { }
+        }
     }
 }

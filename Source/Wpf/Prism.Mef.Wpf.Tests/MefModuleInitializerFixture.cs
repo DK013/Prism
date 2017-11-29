@@ -7,6 +7,7 @@ using System.Linq;
 using CommonServiceLocator;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using Prism.Ioc;
 using Prism.Logging;
 using Prism.Mef.Modularity;
 using Prism.Modularity;
@@ -36,7 +37,7 @@ namespace Prism.Mef.Wpf.Tests
 
             var moduleInitializer = compositionContainer.GetExportedValue<IModuleInitializer>();
 
-            var moduleInfo = new ModuleInfo("TestModuleForInitializer", typeof(TestModuleForInitializer).AssemblyQualifiedName);
+            var moduleInfo = new ModuleInfo(typeof(TestModuleForInitializer), "TestModuleForInitializer");
 
             var module = compositionContainer.GetExportedValues<IModule>().OfType<TestModuleForInitializer>().First();
 
@@ -66,14 +67,13 @@ namespace Prism.Mef.Wpf.Tests
             var moduleInitializer = compositionContainer.GetExportedValue<IModuleInitializer>();
             var repository = compositionContainer.GetExportedValue<DownloadedPartCatalogCollection>();
 
-            var moduleInfo = new ModuleInfo("TestModuleForInitializer", typeof(TestModuleForInitializer).AssemblyQualifiedName);
+            var moduleInfo = new ModuleInfo(typeof(TestModuleForInitializer), "TestModuleForInitializer");
 
             repository.Add(moduleInfo, new TypeCatalog(typeof(TestModuleForInitializer)));
 
             moduleInitializer.Initialize(moduleInfo);
 
-            ComposablePartCatalog existingCatalog;
-            Assert.IsFalse(repository.TryGet(moduleInfo, out existingCatalog));
+            Assert.IsFalse(repository.TryGet(moduleInfo, out ComposablePartCatalog existingCatalog));
 
             var module = compositionContainer.GetExportedValues<IModule>().OfType<TestModuleForInitializer>().First();
 
@@ -84,12 +84,17 @@ namespace Prism.Mef.Wpf.Tests
     [ModuleExport(typeof(TestModuleForInitializer))]
     public class TestModuleForInitializer : IModule
     {
-        public void Initialize()
+        public bool Initialized { get; private set; }
+
+        public void OnInitialized()
         {
-            this.Initialized = true;
+            Initialized = true;
         }
 
-        public bool Initialized { get; private set; }
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            
+        }
     }
 
 }
