@@ -1,5 +1,4 @@
-
-
+#if NETSTANDARD2_0 || NET45
 using System;
 using System.Runtime.Serialization;
 
@@ -19,3 +18,4 @@ namespace Prism.Modularity
         }
     }
 }
+#endif

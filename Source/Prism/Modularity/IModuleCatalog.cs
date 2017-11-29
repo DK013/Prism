@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Prism.Modularity
 {
@@ -14,6 +15,13 @@ namespace Prism.Modularity
         /// Gets all the <see cref="ModuleInfo"/> classes that are in the <see cref="IModuleCatalog"/>.
         /// </summary>
         IEnumerable<ModuleInfo> Modules { get; }
+
+        /// <summary>
+        /// Gets the items in the <see cref="ModuleCatalog"/>. This property is mainly used to add <see cref="ModuleInfoGroup"/>s or
+        /// <see cref="ModuleInfo"/>s through XAML.
+        /// </summary>
+        /// <value>The items in the catalog.</value>
+        Collection<IModuleCatalogItem> Items { get; }
 
         /// <summary>
         /// Return the list of <see cref="ModuleInfo"/>s that <paramref name="moduleInfo"/> depends on.

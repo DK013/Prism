@@ -118,15 +118,6 @@ namespace Prism.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to At least one cyclic dependency has been found in the module catalog. Cycles in the module dependencies must be avoided..
-        /// </summary>
-        internal static string CyclicDependencyFound {
-            get {
-                return ResourceManager.GetString("CyclicDependencyFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Deactivation is not possible in this type of region..
         /// </summary>
         internal static string DeactiveNotPossibleException {
@@ -163,24 +154,6 @@ namespace Prism.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Cannot add dependency for unknown module {0}.
-        /// </summary>
-        internal static string DependencyForUnknownModule {
-            get {
-                return ResourceManager.GetString("DependencyForUnknownModule", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to A module declared a dependency on another module which is not declared to be loaded. Missing module(s): {0}.
-        /// </summary>
-        internal static string DependencyOnMissingModule {
-            get {
-                return ResourceManager.GetString("DependencyOnMissingModule", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Directory {0} was not found..
         /// </summary>
         internal static string DirectoryNotFound {
@@ -213,32 +186,6 @@ namespace Prism.Properties {
         internal static string FailedToGetType {
             get {
                 return ResourceManager.GetString("FailedToGetType", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to An exception occurred while initializing module &apos;{0}&apos;. 
-        ///    - The exception message was: {2}
-        ///    - The Assembly that the module was trying to be loaded from was:{1}
-        ///    Check the InnerException property of the exception for more information. If the exception occurred while creating an object in a DI container, you can exception.GetRootException() to help locate the root cause of the problem. 
-        ///  .
-        /// </summary>
-        internal static string FailedToLoadModule {
-            get {
-                return ResourceManager.GetString("FailedToLoadModule", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to An exception occurred while initializing module &apos;{0}&apos;. 
-        ///    - The exception message was: {1}
-        ///    Check the InnerException property of the exception for more information. If the exception occurred 
-        ///    while creating an object in a DI container, you can exception.GetRootException() to help locate the 
-        ///    root cause of the problem. .
-        /// </summary>
-        internal static string FailedToLoadModuleNoAssemblyInfo {
-            get {
-                return ResourceManager.GetString("FailedToLoadModuleNoAssemblyInfo", resourceCulture);
             }
         }
         
@@ -518,15 +465,6 @@ namespace Prism.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The provided String argument {0} must not be null or empty..
-        /// </summary>
-        internal static string StringCannotBeNullOrEmpty1 {
-            get {
-                return ResourceManager.GetString("StringCannotBeNullOrEmpty1", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to No BehaviorType with key &apos;{0}&apos; was registered..
         /// </summary>
         internal static string TypeWithKeyNotRegistered {
@@ -543,15 +481,6 @@ namespace Prism.Properties {
         internal static string UpdateRegionException {
             get {
                 return ResourceManager.GetString("UpdateRegionException", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The value must be of type ModuleInfo..
-        /// </summary>
-        internal static string ValueMustBeOfTypeModuleInfo {
-            get {
-                return ResourceManager.GetString("ValueMustBeOfTypeModuleInfo", resourceCulture);
             }
         }
         

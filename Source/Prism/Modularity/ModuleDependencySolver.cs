@@ -1,5 +1,3 @@
-
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -9,7 +7,7 @@ using Prism.Common;
 namespace Prism.Modularity
 {
     /// <summary>
-    /// Used by <see cref="ModuleInitializer"/> to get the load sequence
+    /// Used by <see cref="IModuleInitializer"/> to get the load sequence
     /// for the modules to load according to their dependencies.
     /// </summary>
     public class ModuleDependencySolver
@@ -23,7 +21,7 @@ namespace Prism.Modularity
         /// <param name="name">The name that uniquely identifies the module.</param>
         public void AddModule(string name)
         {
-            if (String.IsNullOrEmpty(name))
+            if (string.IsNullOrEmpty(name))
                 throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.StringCannotBeNullOrEmpty, "name"));
 
             AddToDependencyMatrix(name);
@@ -92,7 +90,7 @@ namespace Prism.Modularity
             if (skip.Count > knownModules.Count)
             {
                 string moduleNames = this.FindMissingModules(skip);
-                throw new ModularityException(moduleNames, String.Format(CultureInfo.CurrentCulture,
+                throw new ModularityException(moduleNames, string.Format(CultureInfo.CurrentCulture,
                                                             Resources.DependencyOnMissingModule,
                                                             moduleNames));
             }

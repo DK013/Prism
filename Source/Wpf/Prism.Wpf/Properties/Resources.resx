@@ -138,9 +138,6 @@
     If you did not explicitly set the control's Content property, 
     this exception may be caused by a change in the value of the inherited RegionManager attached property.</value>
   </data>
-  <data name="CyclicDependencyFound" xml:space="preserve">
-    <value>At least one cyclic dependency has been found in the module catalog. Cycles in the module dependencies must be avoided.</value>
-  </data>
   <data name="DeactiveNotPossibleException" xml:space="preserve">
     <value>Deactivation is not possible in this type of region.</value>
   </data>
@@ -153,12 +150,6 @@
   <data name="DelegateCommandInvalidGenericPayloadType" xml:space="preserve">
     <value>T for DelegateCommand&lt;T&gt; is not an object nor Nullable.</value>
   </data>
-  <data name="DependencyForUnknownModule" xml:space="preserve">
-    <value>Cannot add dependency for unknown module {0}</value>
-  </data>
-  <data name="DependencyOnMissingModule" xml:space="preserve">
-    <value>A module declared a dependency on another module which is not declared to be loaded. Missing module(s): {0}</value>
-  </data>
   <data name="DirectoryNotFound" xml:space="preserve">
     <value>Directory {0} was not found.</value>
   </data>
@@ -170,20 +161,6 @@
   </data>
   <data name="FailedToGetType" xml:space="preserve">
     <value>Unable to retrieve the module type {0} from the loaded assemblies.  You may need to specify a more fully-qualified type name.</value>
-  </data>
-  <data name="FailedToLoadModule" xml:space="preserve">
-    <value>An exception occurred while initializing module '{0}'. 
-    - The exception message was: {2}
-    - The Assembly that the module was trying to be loaded from was:{1}
-    Check the InnerException property of the exception for more information. If the exception occurred while creating an object in a DI container, you can exception.GetRootException() to help locate the root cause of the problem. 
-  </value>
-  </data>
-  <data name="FailedToLoadModuleNoAssemblyInfo" xml:space="preserve">
-    <value>An exception occurred while initializing module '{0}'. 
-    - The exception message was: {1}
-    Check the InnerException property of the exception for more information. If the exception occurred 
-    while creating an object in a DI container, you can exception.GetRootException() to help locate the 
-    root cause of the problem. </value>
   </data>
   <data name="HostControlCannotBeNull" xml:space="preserve">
     <value>HostControl cannot have null value when behavior attaches. </value>
@@ -280,9 +257,6 @@
   <data name="StringCannotBeNullOrEmpty" xml:space="preserve">
     <value>The provided String argument {0} must not be null or empty.</value>
   </data>
-  <data name="StringCannotBeNullOrEmpty1" xml:space="preserve">
-    <value>The provided String argument {0} must not be null or empty.</value>
-  </data>
   <data name="TypeWithKeyNotRegistered" xml:space="preserve">
     <value>No BehaviorType with key '{0}' was registered.</value>
   </data>
@@ -290,9 +264,6 @@
     <value>An exception occurred while trying to create region objects. 
     - The most likely causing exception was: '{0}'.
     But also check the InnerExceptions for more detail or call .GetRootException(). </value>
-  </data>
-  <data name="ValueMustBeOfTypeModuleInfo" xml:space="preserve">
-    <value>The value must be of type ModuleInfo.</value>
   </data>
   <data name="ValueNotFound" xml:space="preserve">
     <value>{0} not found.</value>

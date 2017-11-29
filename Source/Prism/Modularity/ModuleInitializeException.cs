@@ -60,7 +60,7 @@ namespace Prism.Modularity
         public ModuleInitializeException(string moduleName, string moduleAssembly, string message, Exception innerException)
             : base(
                 moduleName,
-                String.Format(CultureInfo.CurrentCulture, Resources.FailedToLoadModule, moduleName, moduleAssembly, message),
+                string.Format(CultureInfo.CurrentCulture, Resources.FailedToLoadModule, moduleName, moduleAssembly, message),
                 innerException)
         {
         }

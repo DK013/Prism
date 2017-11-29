@@ -1,14 +1,10 @@
-
-
-using Prism.Properties;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Globalization;
-using System.IO;
 using System.Linq;
-using System.Windows.Markup;
+using Prism.Properties;
 
 namespace Prism.Modularity
 {
@@ -29,10 +25,10 @@ namespace Prism.Modularity
     /// </list>
     /// The <see cref="ModuleCatalog"/> also serves as a baseclass for more specialized Catalogs .
     /// </summary>
-    [ContentProperty("Items")]
-    public class ModuleCatalog : IModuleCatalog
+
+    public partial class ModuleCatalog : IModuleCatalog
     {
-        private readonly ModuleCatalogItemCollection items;
+        private readonly ModuleCatalogItemCollection _items;
         private bool isLoaded;
 
         /// <summary>
@@ -40,24 +36,11 @@ namespace Prism.Modularity
         /// </summary>
         public ModuleCatalog()
         {
-            this.items = new ModuleCatalogItemCollection();
-            this.items.CollectionChanged += this.ItemsCollectionChanged;
+            _items = new ModuleCatalogItemCollection();
+            _items.CollectionChanged += ItemsCollectionChanged;
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ModuleCatalog"/> class while providing an
-        /// initial list of <see cref="ModuleInfo"/>s.
-        /// </summary>
-        /// <param name="modules">The initial list of modules.</param>
-        public ModuleCatalog(IEnumerable<ModuleInfo> modules)
-            : this()
-        {
-            if (modules == null) throw new ArgumentNullException(nameof(modules));
-            foreach (ModuleInfo moduleInfo in modules)
-            {
-                this.Items.Add(moduleInfo);
-            }
-        }
+
 
         /// <summary>
         /// Gets the items in the <see cref="ModuleCatalog"/>. This property is mainly used to add <see cref="ModuleInfoGroup"/>s or
@@ -66,7 +49,7 @@ namespace Prism.Modularity
         /// <value>The items in the catalog.</value>
         public Collection<IModuleCatalogItem> Items
         {
-            get { return this.items; }
+            get => _items;
         }
 
         /// <summary>
@@ -76,10 +59,7 @@ namespace Prism.Modularity
         /// <value>The modules.</value>
         public virtual IEnumerable<ModuleInfo> Modules
         {
-            get
-            {
-                return this.GrouplessModules.Union(this.Groups.SelectMany(g => g));
-            }
+            get => GrouplessModules.Union(Groups.SelectMany(g => g));
         }
 
         /// <summary>
@@ -88,10 +68,7 @@ namespace Prism.Modularity
         /// <value>The groups.</value>
         public IEnumerable<ModuleInfoGroup> Groups
         {
-            get
-            {
-                return this.Items.OfType<ModuleInfoGroup>();
-            }
+            get => Items.OfType<ModuleInfoGroup>();
         }
 
         /// <summary>
@@ -106,42 +83,7 @@ namespace Prism.Modularity
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Groupless")]
         protected IEnumerable<ModuleInfo> GrouplessModules
         {
-            get
-            {
-                return this.Items.OfType<ModuleInfo>();
-            }
-        }
-
-        /// <summary>
-        /// Creates a <see cref="ModuleCatalog"/> from XAML.
-        /// </summary>
-        /// <param name="xamlStream"><see cref="Stream"/> that contains the XAML declaration of the catalog.</param>
-        /// <returns>An instance of <see cref="ModuleCatalog"/> built from the XAML.</returns>
-        public static ModuleCatalog CreateFromXaml(Stream xamlStream)
-        {
-            if (xamlStream == null)
-            {
-                throw new ArgumentNullException(nameof(xamlStream));
-            }
-
-            return XamlReader.Load(xamlStream) as ModuleCatalog;
-        }
-
-        /// <summary>
-        /// Creates a <see cref="ModuleCatalog"/> from a XAML included as an Application Resource.
-        /// </summary>
-        /// <param name="builderResourceUri">Relative <see cref="Uri"/> that identifies the XAML included as an Application Resource.</param>
-        /// <returns>An instance of <see cref="ModuleCatalog"/> build from the XAML.</returns>
-        public static ModuleCatalog CreateFromXaml(Uri builderResourceUri)
-        {
-            var streamInfo = System.Windows.Application.GetResourceStream(builderResourceUri);
-
-            if ((streamInfo != null) && (streamInfo.Stream != null))
-            {
-                return CreateFromXaml(streamInfo.Stream);
-            }
-
-            return null;
+            get => Items.OfType<ModuleInfo>();
         }
 
         /// <summary>
@@ -149,8 +91,8 @@ namespace Prism.Modularity
         /// </summary>
         public void Load()
         {
-            this.isLoaded = true;
-            this.InnerLoad();
+            isLoaded = true;
+            InnerLoad();
         }
 
         /// <summary>
@@ -163,9 +105,9 @@ namespace Prism.Modularity
         /// <returns>An enumeration of <see cref="ModuleInfo"/> that <paramref name="moduleInfo"/> depends on.</returns>
         public virtual IEnumerable<ModuleInfo> GetDependentModules(ModuleInfo moduleInfo)
         {
-            this.EnsureCatalogValidated();
+            EnsureCatalogValidated();
 
-            return this.GetDependentModulesInner(moduleInfo);
+            return GetDependentModulesInner(moduleInfo);
         }
 
         /// <summary>
@@ -182,7 +124,7 @@ namespace Prism.Modularity
             if (modules == null)
                 throw new ArgumentNullException(nameof(modules));
 
-            this.EnsureCatalogValidated();
+            EnsureCatalogValidated();
 
             List<ModuleInfo> completeList = new List<ModuleInfo>();
             List<ModuleInfo> pendingList = modules.ToList();
@@ -190,7 +132,7 @@ namespace Prism.Modularity
             {
                 ModuleInfo moduleInfo = pendingList[0];
 
-                foreach (ModuleInfo dependency in this.GetDependentModules(moduleInfo))
+                foreach (ModuleInfo dependency in GetDependentModules(moduleInfo))
                 {
                     if (!completeList.Contains(dependency) && !pendingList.Contains(dependency))
                     {
@@ -202,7 +144,7 @@ namespace Prism.Modularity
                 completeList.Add(moduleInfo);
             }
 
-            IEnumerable<ModuleInfo> sortedList = this.Sort(completeList);
+            IEnumerable<ModuleInfo> sortedList = Sort(completeList);
             return sortedList;
         }
 
@@ -212,12 +154,12 @@ namespace Prism.Modularity
         /// <exception cref="ModularityException">When validation of the <see cref="ModuleCatalog"/> fails.</exception>
         public virtual void Validate()
         {
-            this.ValidateUniqueModules();
-            this.ValidateDependencyGraph();
-            this.ValidateCrossGroupDependencies();
-            this.ValidateDependenciesInitializationMode();
+            ValidateUniqueModules();
+            ValidateDependencyGraph();
+            ValidateCrossGroupDependencies();
+            ValidateDependenciesInitializationMode();
 
-            this.Validated = true;
+            Validated = true;
         }
 
         /// <summary>
@@ -227,81 +169,7 @@ namespace Prism.Modularity
         /// <returns>The <see cref="ModuleCatalog"/> for easily adding multiple modules.</returns>
         public virtual IModuleCatalog AddModule(ModuleInfo moduleInfo)
         {
-            this.Items.Add(moduleInfo);
-            return this;
-        }
-
-        /// <summary>
-        /// Adds a groupless <see cref="ModuleInfo"/> to the catalog.
-        /// </summary>
-        /// <param name="moduleType"><see cref="Type"/> of the module to be added.</param>
-        /// <param name="dependsOn">Collection of module names (<see cref="ModuleInfo.ModuleName"/>) of the modules on which the module to be added logically depends on.</param>
-        /// <returns>The same <see cref="ModuleCatalog"/> instance with the added module.</returns>
-        //public IModuleCatalog AddModule(Type moduleType, params string[] dependsOn)
-        //{
-        //    return this.AddModule(moduleType, InitializationMode.WhenAvailable, dependsOn);
-        //}
-
-        /// <summary>
-        /// Adds a groupless <see cref="ModuleInfo"/> to the catalog.
-        /// </summary>
-        /// <param name="moduleType"><see cref="Type"/> of the module to be added.</param>
-        /// <param name="initializationMode">Stage on which the module to be added will be initialized.</param>
-        /// <param name="dependsOn">Collection of module names (<see cref="ModuleInfo.ModuleName"/>) of the modules on which the module to be added logically depends on.</param>
-        /// <returns>The same <see cref="ModuleCatalog"/> instance with the added module.</returns>
-        //public IModuleCatalog AddModule(Type moduleType, InitializationMode initializationMode, params string[] dependsOn)
-        //{
-        //    if (moduleType == null) throw new ArgumentNullException(nameof(moduleType));
-        //    return this.AddModule(moduleType, moduleType.AssemblyQualifiedName, initializationMode, dependsOn);
-        //}
-
-        /// <summary>
-        /// Adds a groupless <see cref="ModuleInfo"/> to the catalog.
-        /// </summary>
-        /// <param name="moduleName">Name of the module to be added.</param>
-        /// <param name="moduleType"><see cref="Type"/> of the module to be added.</param>
-        /// <param name="dependsOn">Collection of module names (<see cref="ModuleInfo.ModuleName"/>) of the modules on which the module to be added logically depends on.</param>
-        /// <returns>The same <see cref="ModuleCatalog"/> instance with the added module.</returns>
-        public IModuleCatalog AddModule(string moduleName, Type moduleType, params string[] dependsOn)
-        {
-            return this.AddModule(moduleName, moduleType, InitializationMode.WhenAvailable, dependsOn);
-        }
-
-        /// <summary>
-        /// Adds a groupless <see cref="ModuleInfo"/> to the catalog.
-        /// </summary>
-        /// <param name="moduleName">Name of the module to be added.</param>
-        /// <param name="moduleType"><see cref="Type"/> of the module to be added.</param>
-        /// <param name="initializationMode">Stage on which the module to be added will be initialized.</param>
-        /// <param name="dependsOn">Collection of module names (<see cref="ModuleInfo.ModuleName"/>) of the modules on which the module to be added logically depends on.</param>
-        /// <returns>The same <see cref="ModuleCatalog"/> instance with the added module.</returns>
-        public IModuleCatalog AddModule(string moduleName, Type moduleType, InitializationMode initializationMode, params string[] dependsOn)
-        {
-            return this.AddModule(moduleName, moduleType, null, initializationMode, dependsOn);
-        }
-
-        /// <summary>
-        /// Adds a groupless <see cref="ModuleInfo"/> to the catalog.
-        /// </summary>
-        /// <param name="moduleName">Name of the module to be added.</param>
-        /// <param name="moduleType"><see cref="Type"/> of the module to be added.</param>
-        /// <param name="refValue">Reference to the location of the module to be added assembly.</param>
-        /// <param name="initializationMode">Stage on which the module to be added will be initialized.</param>
-        /// <param name="dependsOn">Collection of module names (<see cref="ModuleInfo.ModuleName"/>) of the modules on which the module to be added logically depends on.</param>
-        /// <returns>The same <see cref="ModuleCatalog"/> instance with the added module.</returns>
-        public ModuleCatalog AddModule(string moduleName, Type moduleType, string refValue, InitializationMode initializationMode, params string[] dependsOn)
-        {
-            if (moduleName == null)
-                throw new ArgumentNullException(nameof(moduleName));
-
-            if (moduleType == null)
-                throw new ArgumentNullException(nameof(moduleType));
-
-            ModuleInfo moduleInfo = new ModuleInfo(moduleName, moduleType);
-            moduleInfo.DependsOn.AddRange(dependsOn);
-            moduleInfo.InitializationMode = initializationMode;
-            moduleInfo.Ref = refValue;
-            this.Items.Add(moduleInfo);
+            Items.Add(moduleInfo);
             return this;
         }
 
@@ -311,12 +179,12 @@ namespace Prism.Modularity
         /// <exception cref="ModularityException">When validation of the <see cref="ModuleCatalog"/> fails, because this method calls <see cref="Validate"/>.</exception>
         public virtual void Initialize()
         {
-            if (!this.isLoaded)
+            if (!isLoaded)
             {
-                this.Load();
+                Load();
             }
 
-            this.Validate();
+            Validate();
         }
 
         /// <summary>
@@ -332,16 +200,18 @@ namespace Prism.Modularity
             if (moduleInfos == null)
                 throw new ArgumentNullException(nameof(moduleInfos));
 
-            ModuleInfoGroup newGroup = new ModuleInfoGroup();
-            newGroup.InitializationMode = initializationMode;
-            newGroup.Ref = refValue;
+            ModuleInfoGroup newGroup = new ModuleInfoGroup
+            {
+                InitializationMode = initializationMode,
+                Ref = refValue
+            };
 
             foreach (ModuleInfo info in moduleInfos)
             {
                 newGroup.Add(info);
             }
 
-            this.items.Add(newGroup);
+            _items.Add(newGroup);
 
             return this;
         }
@@ -435,14 +305,14 @@ namespace Prism.Modularity
         /// </exception>
         protected virtual void ValidateUniqueModules()
         {
-            List<string> moduleNames = this.Modules.Select(m => m.ModuleName).ToList();
+            List<string> moduleNames = Modules.Select(m => m.ModuleName).ToList();
 
             string duplicateModule = moduleNames.FirstOrDefault(
                 m => moduleNames.Count(m2 => m2 == m) > 1);
 
             if (duplicateModule != null)
             {
-                throw new DuplicateModuleException(duplicateModule, String.Format(CultureInfo.CurrentCulture, Resources.DuplicatedModule, duplicateModule));
+                throw new DuplicateModuleException(duplicateModule, string.Format(CultureInfo.CurrentCulture, Resources.DuplicatedModule, duplicateModule));
             }
         }
 
@@ -451,7 +321,7 @@ namespace Prism.Modularity
         /// </summary>
         protected virtual void ValidateDependencyGraph()
         {
-            SolveDependencies(this.Modules);
+            SolveDependencies(Modules);
         }
 
         /// <summary>
@@ -463,10 +333,10 @@ namespace Prism.Modularity
         /// </remarks>
         protected virtual void ValidateCrossGroupDependencies()
         {
-            ValidateDependencies(this.GrouplessModules);
-            foreach (ModuleInfoGroup group in this.Groups)
+            ValidateDependencies(GrouplessModules);
+            foreach (ModuleInfoGroup group in Groups)
             {
-                ValidateDependencies(this.GrouplessModules.Union(group));
+                ValidateDependencies(GrouplessModules.Union(group));
             }
         }
 
@@ -476,10 +346,10 @@ namespace Prism.Modularity
         /// </summary>
         protected virtual void ValidateDependenciesInitializationMode()
         {
-            ModuleInfo moduleInfo = this.Modules.FirstOrDefault(
+            ModuleInfo moduleInfo = Modules.FirstOrDefault(
                 m =>
                 m.InitializationMode == InitializationMode.WhenAvailable &&
-                this.GetDependentModulesInner(m)
+                GetDependentModulesInner(m)
                     .Any(dependency => dependency.InitializationMode == InitializationMode.OnDemand));
 
             if (moduleInfo != null)
@@ -497,7 +367,7 @@ namespace Prism.Modularity
         /// <returns>Collection of <see cref="ModuleInfo"/> dependants of <paramref name="moduleInfo"/>.</returns>
         protected virtual IEnumerable<ModuleInfo> GetDependentModulesInner(ModuleInfo moduleInfo)
         {
-            return this.Modules.Where(dependantModule => moduleInfo.DependsOn.Contains(dependantModule.ModuleName));
+            return Modules.Where(dependantModule => moduleInfo.DependsOn.Contains(dependantModule.ModuleName));
         }
 
         /// <summary>
@@ -505,37 +375,17 @@ namespace Prism.Modularity
         /// </summary>
         protected virtual void EnsureCatalogValidated()
         {
-            if (!this.Validated)
+            if (!Validated)
             {
-                this.Validate();
+                Validate();
             }
         }
 
         private void ItemsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            if (this.Validated)
+            if (Validated)
             {
-                this.EnsureCatalogValidated();
-            }
-        }
-
-        private class ModuleCatalogItemCollection : Collection<IModuleCatalogItem>, INotifyCollectionChanged
-        {
-            public event NotifyCollectionChangedEventHandler CollectionChanged;
-
-            protected override void InsertItem(int index, IModuleCatalogItem item)
-            {
-                base.InsertItem(index, item);
-
-                this.OnNotifyCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, index));
-            }
-
-            protected void OnNotifyCollectionChanged(NotifyCollectionChangedEventArgs eventArgs)
-            {
-                if (this.CollectionChanged != null)
-                {
-                    this.CollectionChanged(this, eventArgs);
-                }
+                EnsureCatalogValidated();
             }
         }
     }

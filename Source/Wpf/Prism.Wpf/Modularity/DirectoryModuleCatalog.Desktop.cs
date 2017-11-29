@@ -231,7 +231,7 @@ namespace Prism.Modularity
                     dependsOn.Add((string) cad.ConstructorArguments[0].Value);
                 }
 
-                ModuleInfo moduleInfo = new ModuleInfo(moduleName, type)
+                ModuleInfo moduleInfo = new ModuleInfo(type, moduleName)
                                             {
                                                 InitializationMode =
                                                     onDemand

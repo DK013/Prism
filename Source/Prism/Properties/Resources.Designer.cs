@@ -80,6 +80,15 @@ namespace Prism.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to At least one cyclic dependency has been found in the module catalog. Cycles in the module dependencies must be avoided..
+        /// </summary>
+        internal static string CyclicDependencyFound {
+            get {
+                return ResourceManager.GetString("CyclicDependencyFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {1}: {2}. Priority: {3}. Timestamp:{0:u}..
         /// </summary>
         internal static string DefaultDebugLoggerPattern {
@@ -107,11 +116,54 @@ namespace Prism.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot add dependency for unknown module {0}.
+        /// </summary>
+        internal static string DependencyForUnknownModule {
+            get {
+                return ResourceManager.GetString("DependencyForUnknownModule", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A module declared a dependency on another module which is not declared to be loaded. Missing module(s): {0}.
+        /// </summary>
+        internal static string DependencyOnMissingModule {
+            get {
+                return ResourceManager.GetString("DependencyOnMissingModule", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to To use the UIThread option for subscribing, the EventAggregator must be constructed on the UI thread..
         /// </summary>
         internal static string EventAggregatorNotConstructedOnUIThread {
             get {
                 return ResourceManager.GetString("EventAggregatorNotConstructedOnUIThread", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An exception occurred while initializing module &apos;{0}&apos;. 
+        ///    - The exception message was: {2}
+        ///    - The Assembly that the module was trying to be loaded from was:{1}
+        ///    Check the InnerException property of the exception for more information. If the exception occurred while creating an object in a DI container, you can exception.GetRootException() to help locate the root cause of the problem..
+        /// </summary>
+        internal static string FailedToLoadModule {
+            get {
+                return ResourceManager.GetString("FailedToLoadModule", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An exception occurred while initializing module &apos;{0}&apos;. 
+        ///    - The exception message was: {1}
+        ///    Check the InnerException property of the exception for more information. If the exception occurred 
+        ///    while creating an object in a DI container, you can exception.GetRootException() to help locate the 
+        ///    root cause of the problem..
+        /// </summary>
+        internal static string FailedToLoadModuleNoAssemblyInfo {
+            get {
+                return ResourceManager.GetString("FailedToLoadModuleNoAssemblyInfo", resourceCulture);
             }
         }
         
@@ -185,6 +237,24 @@ namespace Prism.Properties {
         internal static string PropertySupport_StaticExpression_Exception {
             get {
                 return ResourceManager.GetString("PropertySupport_StaticExpression_Exception", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The provided String argument {0} must not be null or empty..
+        /// </summary>
+        internal static string StringCannotBeNullOrEmpty {
+            get {
+                return ResourceManager.GetString("StringCannotBeNullOrEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value must be of type ModuleInfo..
+        /// </summary>
+        internal static string ValueMustBeOfTypeModuleInfo {
+            get {
+                return ResourceManager.GetString("ValueMustBeOfTypeModuleInfo", resourceCulture);
             }
         }
     }

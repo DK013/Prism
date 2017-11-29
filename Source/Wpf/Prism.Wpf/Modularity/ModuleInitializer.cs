@@ -1,29 +1,14 @@
-using CommonServiceLocator;
-using Prism.Logging;
 using System;
-using System.Globalization;
+using System.Reflection;
+using Prism.Logging;
 
 namespace Prism.Modularity
 {
     /// <summary>
     /// Implements the <see cref="IModuleInitializer"/> interface. Handles loading of a module based on a type.
     /// </summary>
-    public class ModuleInitializer : IModuleInitializer
+    public partial class ModuleInitializer : IModuleInitializer
     {
-        private readonly IServiceLocator serviceLocator;
-        private readonly ILoggerFacade loggerFacade;
-
-        /// <summary>
-        /// Initializes a new instance of <see cref="ModuleInitializer"/>.
-        /// </summary>
-        /// <param name="serviceLocator">The container that will be used to resolve the modules by specifying its type.</param>
-        /// <param name="loggerFacade">The logger to use.</param>
-        public ModuleInitializer(IServiceLocator serviceLocator, ILoggerFacade loggerFacade)
-        {
-            this.serviceLocator = serviceLocator ?? throw new ArgumentNullException(nameof(serviceLocator));
-            this.loggerFacade = loggerFacade ?? throw new ArgumentNullException(nameof(loggerFacade));
-        }
-
         /// <summary>
         /// Initializes the specified module.
         /// </summary>
@@ -44,7 +29,7 @@ namespace Prism.Modularity
             {
                 HandleModuleInitializationError(
                     moduleInfo,
-                    moduleInstance != null ? moduleInstance.GetType().Assembly.FullName : null,
+                    moduleInstance != null ? moduleInstance.GetType().GetTypeInfo().Assembly.FullName : null,
                     ex);
             }
         }
@@ -84,7 +69,7 @@ namespace Prism.Modularity
                 }
             }
 
-            this.loggerFacade.Log(moduleException.ToString(), Category.Exception, Priority.High);
+            _loggerFacade.Log(moduleException.ToString(), Category.Exception, Priority.High);
 
             throw moduleException;
         }
@@ -99,23 +84,7 @@ namespace Prism.Modularity
             if (moduleInfo == null)
                 throw new ArgumentNullException(nameof(moduleInfo));
 
-            return this.CreateModule(moduleInfo.ModuleType);
-        }
-
-        /// <summary>
-        /// Uses the container to resolve a new <see cref="IModule"/> by specifying its <see cref="Type"/>.
-        /// </summary>
-        /// <param name="typeName">The type name to resolve. This type must implement <see cref="IModule"/>.</param>
-        /// <returns>A new instance of <paramref name="typeName"/>.</returns>
-        protected virtual IModule CreateModule(Type moduleType)
-        {
-            //Type moduleType = Type.GetType(typeName);
-            if (moduleType == null)
-            {
-                throw new ModuleInitializeException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.FailedToGetType, moduleType.AssemblyQualifiedName));
-            }
-
-            return (IModule)this.serviceLocator.GetInstance(moduleType);
+            return CreateModule(moduleInfo.ModuleType);
         }
     }
 }

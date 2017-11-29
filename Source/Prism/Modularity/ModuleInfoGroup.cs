@@ -63,10 +63,12 @@ namespace Prism.Modularity
             if (moduleInfo == null)
                 throw new ArgumentNullException(nameof(moduleInfo));
 
+#if NET45
             if (moduleInfo.Ref == null)
             {
                 moduleInfo.Ref = this.Ref;
             }
+#endif
 
             if (moduleInfo.InitializationMode == InitializationMode.WhenAvailable && this.InitializationMode != InitializationMode.WhenAvailable)
             {
