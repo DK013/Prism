@@ -9,6 +9,58 @@ namespace Prism.Modularity
     public partial class ModuleInfo : IModuleCatalogItem
     {
         /// <summary>
+        /// Initializes a new instance of <see cref="ModuleInfo"/>.
+        /// </summary>
+        /// <param name="moduleType">The module's type.</param>
+        public ModuleInfo(Type moduleType)
+            : this(moduleType, moduleType.Name) { }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="ModuleInfo"/>.
+        /// </summary>
+        /// <param name="moduleType">The module <see cref="Type"/>'s AssemblyQualifiedName.</param>
+        /// <param name="moduleName">The module's name.</param>
+        /// <param name="dependsOn">The modules this instance depends on.</param>
+        /// <exception cref="ArgumentNullException">An <see cref="ArgumentNullException"/> is thrown if <paramref name="dependsOn"/> is <see langword="null"/>.</exception>
+        public ModuleInfo(Type moduleType, string moduleName, params string[] dependsOn)
+            : this(moduleType, moduleName, InitializationMode.WhenAvailable, dependsOn)
+        {
+            
+        }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="ModuleInfo"/>.
+        /// </summary>
+        /// <param name="type">The module's type.</param>
+        /// <param name="moduleName">The module's name.</param>
+        public ModuleInfo(Type type, string moduleName)
+            : this(type, moduleName, new string[0])
+        {
+        }
+
+            /// <summary>
+            /// Initializes a new instance of <see cref="ModuleInfo"/>.
+            /// </summary>
+            /// <param name="moduleType">The module's type.</param>
+            /// <param name="moduleName">The module's name.</param>
+            /// <param name="initializationMode">The module's <see cref="InitializationMode"/>.</param>
+            /// <param name="dependsOn">The modules this instance depends on.</param>
+            /// <exception cref="ArgumentNullException">An <see cref="ArgumentNullException"/> is thrown if <paramref name="dependsOn"/> is <see langword="null"/>.</exception>
+            public ModuleInfo(Type moduleType, string moduleName, InitializationMode initializationMode, params string[] dependsOn)
+        {
+            if (dependsOn == null)
+                throw new ArgumentNullException(nameof(dependsOn));
+
+            ModuleName = moduleName;
+            ModuleType = moduleType;
+            InitializationMode = initializationMode;
+            DependsOn = new Collection<string>();
+            foreach (string dependency in dependsOn)
+            {
+                DependsOn.Add(dependency);
+            }
+        }
+        /// <summary>
         /// Gets or sets the name of the module.
         /// </summary>
         /// <value>The name of the module.</value>
